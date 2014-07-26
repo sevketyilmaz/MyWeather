@@ -246,6 +246,17 @@ public class ForecastFragment extends Fragment {
             return resultStrs;
         }
 
+        @Override
+        protected void onPostExecute(String[] result) {
+            //update the list view with real data feed
+            if(result != null){
+                mForecastAdapter.clear();
+                for (String s : result)
+                    mForecastAdapter.add(s);
+            }
+
+        }
+
         // Prepare the weather high/lows for presentation.
         private String formatHiAndLow(double hi, double low) {
             long roundedHigh = Math.round(hi);
