@@ -21,13 +21,24 @@
         <activity
             android:name="tr.com.example.sunshine.app.DetailActivity"
             android:label="@string/title_activity_detail"
+            android:parentActivityName="tr.com.example.sunshine.app.MainActivity" >
+
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MainActivity" />
+        </activity>
+
+        <activity
+            android:name="tr.com.example.sunshine.app.SettingsActivity"
+            android:label="@string/title_activity_settings"
             android:parentActivityName=".MainActivity">
 
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />
-
         </activity>
+
+
     </application>
 
 </manifest>
