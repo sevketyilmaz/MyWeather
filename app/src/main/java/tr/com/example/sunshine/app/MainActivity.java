@@ -57,6 +57,7 @@ public class MainActivity extends ActionBarActivity {
      * A placeholder fragment containing a simple view.
      */
     public static class PlaceholderFragment extends Fragment {
+        ArrayAdapter<String> mForecastAdapter;
 
         public PlaceholderFragment() {
         }
@@ -70,20 +71,21 @@ public class MainActivity extends ActionBarActivity {
                     "Today - Sunny - 89/78",
                     "Tomorrow - Foggy - 12/85",
                     "Wednesday - Cloudy - 78/85",
-                    "Thursday - Asteroids - 5/41",
-                    "Friday - Rain - 25/78"
+                    "Thursday - Asteroids - */*",
+                    "Friday - Rain - */*",
+                    "Pazar - acik - */*"
             };
 
             List<String> weekForecast = new ArrayList<String>(Arrays.asList(forecastArray));
 
-            ArrayAdapter<String> adapter = new ArrayAdapter<String>(
+            mForecastAdapter = new ArrayAdapter<String>(
                     getActivity(),
                     R.layout.list_item_forecast,
                     R.id.list_item_forecast_textview,
                     weekForecast);
 
             ListView listView = (ListView) rootView.findViewById(R.id.listview_forecast);
-            listView.setAdapter(adapter);
+            listView.setAdapter(mForecastAdapter);
 
             return rootView;
         }
