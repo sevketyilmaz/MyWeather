@@ -14,14 +14,20 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -83,17 +89,16 @@ public class ForecastFragment extends Fragment {
                 FetchWeatherTask weatherTask = new FetchWeatherTask();
                 weatherTask.execute("94043");
                 return true;
-
         }
         return super.onOptionsItemSelected(item);
     }
 
 
-    public class FetchWeatherTask extends AsyncTask<String, Void, Void> {
+    public class FetchWeatherTask extends AsyncTask<String, Void, String[]> {
         private final String TAG = FetchWeatherTask.class.getSimpleName();
 
         @Override
-        protected Void doInBackground(String... params) {
+        protected String[] doInBackground(String... params) {
             //if there is no zipcode, nothing to look
             if(params.length == 0)
                 return null;
@@ -179,7 +184,83 @@ public class ForecastFragment extends Fragment {
                 }
             }
 
+            try {
+                return getWeatherDataFromJson(forecastJsonStr, numDays);
+            }catch (JSONException e){
+                Log.e(TAG, e.getMessage(), e);
+                e.printStackTrace();
+            }
+
+            //this will only happen if there was an error getting or parsing the forecast
             return null;
+        }
+
+        /**
+         * Take the String representating the complete forecast in JSon format and pull out the data
+         * we need to construct the Strings needed for the wireframes
+         */
+        private String[] getWeatherDataFromJson(String forecastJsonStr, int numDays) throws  JSONException{
+            //These are the names of the JSON objects that need to be extracted
+            final String OWN_LIST = "list";
+            final String OWN_WEATHER = "weather";
+            final String OWN_TEMPERATURE = "temp";
+            final String OWN_MAX = "max";
+            final String OWN_MIN = "min";
+            final String OWN_DATETIME = "dt";
+            final String OWN_DESCRIPTION = "main";
+
+            JSONObject forecastJson = new JSONObject(forecastJsonStr);
+            JSONArray weatherArray = forecastJson.getJSONArray(OWN_LIST);
+
+            String[] resultStrs = new String[numDays];
+
+            //walk in weather array for each object for representing the day
+            for(int i = 0; i < weatherArray.length(); i++){
+                //Used format "Day, Description, Hi/Low"
+                String day;
+                String description;
+                String hiAndLow;
+
+                //get first object from array
+                JSONObject dayForecast = weatherArray.getJSONObject(i);
+
+                //date return as a long, convert to readable date
+                long dateTime = dayForecast.getLong(OWN_DATETIME);
+                day = getReadableDateString(dateTime);
+
+                //description is in a child array called "weather", which is 1 element long
+                description = dayForecast.getJSONArray(OWN_WEATHER).getJSONObject(0).getString(OWN_DESCRIPTION);
+
+                //temperatures are in child object called temp.
+                JSONObject temperatureObject = dayForecast.getJSONObject(OWN_TEMPERATURE);
+                double hi = temperatureObject.getDouble(OWN_MAX);
+                double low = temperatureObject.getDouble(OWN_MIN);
+                hiAndLow = formatHiAndLow(hi, low);
+
+                resultStrs[i] = day + " - " + description + " - " + hiAndLow;
+            }
+            //log the resultStrs
+            for(String s : resultStrs)
+                Log.v(TAG, "Forecast entry: " + s);
+
+            return resultStrs;
+        }
+
+        // Prepare the weather high/lows for presentation.
+        private String formatHiAndLow(double hi, double low) {
+            long roundedHigh = Math.round(hi);
+            long roundedLow = Math.round(low);
+
+            String highLowStr = roundedHigh + "/" + roundedLow;
+            return highLowStr;
+        }
+
+        private String getReadableDateString(long dateTime) {
+            // Because the API returns a unix timestamp (measured in seconds),
+            // it must be converted to milliseconds in order to be converted to valid date.
+            Date date = new Date(dateTime * 1000);
+            SimpleDateFormat format = new SimpleDateFormat("E, MMM d");
+            return format.format(date).toString();
         }
 
     }
