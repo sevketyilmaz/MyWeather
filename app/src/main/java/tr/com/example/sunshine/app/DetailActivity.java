@@ -102,4 +102,6 @@ public class DetailActivity extends ActionBarActivity {
             return shareIntent;
         }
     }
+
+
 }
