@@ -21,12 +21,11 @@ public class TestProvider extends AndroidTestCase{
 
     }
 
-    public void testInsertReadDb(){
+    public void testInsertReadProvider(){
 
         WeatherDbHelper dbHelper = new WeatherDbHelper(mContext);
         SQLiteDatabase db = dbHelper.getWritableDatabase();
 
-        //TODO create location content values
         ContentValues testValues = TestDb.createNorthPoleLocationContentValues();
 
         long locationRowId;
@@ -37,19 +36,10 @@ public class TestProvider extends AndroidTestCase{
         Log.d(TAG, "New row id: " + locationRowId);
 
         //In theory data is inserted. now we pull some out of it and check it
-        //Specify which columns you want
-        String[] columns = {
-          LocationEntry._ID,
-          LocationEntry.COLUMN_LOCATION_SETTING,
-          LocationEntry.COLUMN_CITY_NAME,
-          LocationEntry.COLUMN_COORD_LAT,
-          LocationEntry.COLUMN_COORD_LONG
-        };
-
         //A CURSOR your primary interface to the query results
         Cursor cursor = db.query(
                 LocationEntry.TABLE_NAME, //Table to query
-                columns, //if its null, returns all columns
+                null, //if its null, returns all columns
                 null,   //columns for WHERE clause
                 null,   //values for WHERE clause
                 null,   //columns to GROUP BY
@@ -59,21 +49,18 @@ public class TestProvider extends AndroidTestCase{
 
         TestDb.validateCursor(cursor, testValues);
 
-        //TODO weather content values
         ContentValues weatherValues = TestDb.createWeatherContentValues(locationRowId);
 
         long weatherRowId = db.insert(WeatherEntry.TABLE_NAME, null, weatherValues);
         assertTrue(weatherRowId != -1);
 
         // A cursor is your primary interface to the query results.
-        Cursor weatherCursor = db.query(
-                WeatherEntry.TABLE_NAME,  // Table to Query
+        Cursor weatherCursor = mContext.getContentResolver().query(
+                WeatherEntry.CONTENT_URI,  // Table to Query
                 null, // leaving "columns" null just returns all the columns.
                 null, // cols for "where" clause
                 null, // values for "where" clause
-                null, // columns to group by
-                null, // columns to filter by row groups
-                null  // sort order
+                null  // columns to group by
         );
 
         TestDb.validateCursor(weatherCursor, weatherValues);
