@@ -1,17 +1,34 @@
 package tr.com.example.sunshine.app.data;
 
+import android.net.Uri;
 import android.provider.BaseColumns;
 
 /**
  * Created by svkt on 16.08.2014.
  */
 public class WeatherContract {
+    public static final String CONTENT_AUTHORITY = "tr.com.example.sunshine.app";
+
+    //Use CONTENT_AUTHORITY to create the base of all URI's which app will use the contact the content provider
+    public static final Uri BASE_CONTENT_URI = Uri.parse("content://" + CONTENT_AUTHORITY);
+
+    // Possible paths (appended to base content URI for possible URI's)
+    // For instance, content://tr.com.example.android.sunshine.app/weather/ is a valid path for looking at weather data.
+    public static final String PATH_WEATHER = "weather";
+    public static final String PATH_LOCATION = "location";
+
+
     /*Inner class that defines the table contents of the location table*/
     public static final class LocationEntry implements BaseColumns{
-        public static final String TABLE_NAME = "location";
+        public static final Uri CONTENT_URI = BASE_CONTENT_URI.buildUpon().appendPath(PATH_LOCATION).build();
 
-        // The location setting string is what will be sent to openweathermap
-        // as the location query.
+        public static final String CONTENT_TYPE = "vnd.android.cursor.dir/" + CONTENT_AUTHORITY + "/" + PATH_LOCATION;
+        public static final String CONTENT_ITEM_TYPE = "vnd.android.cursor.item/" + CONTENT_AUTHORITY + "/" + PATH_LOCATION;
+
+
+
+        public static final String TABLE_NAME = "location";
+        // The location setting string is what will be sent to openweathermap as the location query.
         public static final String COLUMN_LOCATION_SETTING = "location_setting";
 
         // Human readable location string, provided by the API.  Because for styling,
@@ -26,9 +43,14 @@ public class WeatherContract {
 
     /* Inner class that defines the table contents of the weather table */
     public static final class WeatherEntry implements BaseColumns {
+        public static final Uri CONTENT_URI = BASE_CONTENT_URI.buildUpon().appendPath(PATH_WEATHER).build();
+
+        public static final String CONTENT_TYPE = "vnd.android.cursor.dir/" + CONTENT_AUTHORITY + "/" + PATH_WEATHER;
+        public static final String CONTENT_ITEM_TYPE = "vnd.android.cursor.item/" + CONTENT_AUTHORITY + "/" + PATH_WEATHER;
+
+
 
         public static final String TABLE_NAME = "weather";
-
         // Column with the foreign key into the location table.
         public static final String COLUMN_LOC_KEY = "location_id";
         // Date, stored as Text with format yyyy-MM-dd
