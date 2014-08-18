@@ -1,6 +1,7 @@
 package tr.com.example.sunshine.app.data;
 
 import android.content.ContentProvider;
+import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.UriMatcher;
 import android.database.Cursor;
@@ -65,12 +66,28 @@ public class WeatherProvider extends ContentProvider {
                 break;
 
             case WEATHER_WITH_LOCATION_AND_DATE: // "weather/*/*"
-                retCursor = null;
+                retCursor = mOpenHelper.getReadableDatabase().query(
+                        WeatherContract.LocationEntry.TABLE_NAME,
+                        projection,
+                        WeatherContract.LocationEntry._ID + " = '" + ContentUris.parseId(uri) + "'",
+                        null,
+                        null,
+                        null,
+                        sortOrder
+                );
                 break;
 
 
             case LOCATION: // "location"
-                retCursor = null;
+                retCursor = mOpenHelper.getReadableDatabase().query(
+                        WeatherContract.LocationEntry.TABLE_NAME,
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null,
+                        null,
+                        sortOrder
+                );
                 break;
 
             case LOCATION_ID: // "location/*"

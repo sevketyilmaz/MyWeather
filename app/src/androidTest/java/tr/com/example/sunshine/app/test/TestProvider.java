@@ -37,13 +37,11 @@ public class TestProvider extends AndroidTestCase{
 
         //In theory data is inserted. now we pull some out of it and check it
         //A CURSOR your primary interface to the query results
-        Cursor cursor = db.query(
-                LocationEntry.TABLE_NAME, //Table to query
+        Cursor cursor = mContext.getContentResolver().query(
+                LocationEntry.CONTENT_URI, //Table to query
                 null, //if its null, returns all columns
                 null,   //columns for WHERE clause
                 null,   //values for WHERE clause
-                null,   //columns to GROUP BY
-                null,   //columns to filter by row groups
                 null    //sort order
         );
 
